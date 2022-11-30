@@ -12,6 +12,7 @@ export default function Navbar() {
                     <img src="/assets/logo.png" alt="logo" />
                 </Menu.Item>
                 <Menu.Item as = {NavLink} to='/activities' name="Activities" exact />
+                <Menu.Item as = {NavLink} to='/errors' name="Errors" exact />
                 <Menu.Item>
                     <Button as = {NavLink} to = '/create-activity' positive content="Create Activity" />
                 </Menu.Item>
