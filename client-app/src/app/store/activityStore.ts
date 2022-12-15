@@ -2,6 +2,7 @@ import { format } from "date-fns";
 import { makeAutoObservable, runInAction } from "mobx";
 import agent from "../api/agent";
 import { Activity } from "../models/activity";
+import { store } from "./store";
 
 
 export default class ActivityStore {
@@ -72,6 +73,17 @@ export default class ActivityStore {
         }
     }
     private setActivity = (activity: Activity) => {
+        const user = store.userStore.user;
+        // console.log(user?.username);
+        
+        if(user){
+            activity.isGoing = activity.attendees!.some(a=> a.username === user.username);
+            console.log(activity.isGoing);
+            
+            activity.isHost = activity.hostUsername === user.username;
+            activity.host = activity.attendees?.find(x => x.username === activity.hostUsername);
+            console.log(activity.host);
+        }
         // activity.date = activity.date.split('T')[0];
         activity.date = new Date(activity.date!)
         this.activityRegistry.set(activity.id, activity);
