@@ -3,12 +3,14 @@ import { Segment, List, Label, Item, Image } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { observer } from 'mobx-react-lite'
 import { Profile } from '../../../app/models/profile';
+import { Activity } from '../../../app/models/activity';
 
 interface Props {
-    attendees: Profile[];
+    activity: Activity;
 }
 
-export default observer(function ActivityDetailSideBar({ attendees }: Props) {
+export default observer(function ActivityDetailSideBar({ activity: { attendees, host } }: Props) {
+    if (!attendees) return null;
     return (
         <>
             <Segment
@@ -24,14 +26,16 @@ export default observer(function ActivityDetailSideBar({ attendees }: Props) {
             <Segment attached>
                 <List relaxed divided>
                     {attendees.map(attn => (
-                        <Item style={{ position: 'relative' }} key={ attn.username }>
-                            <Label
-                                style={{ position: 'absolute' }}
-                                color='orange'
-                                ribbon='right'
-                            >
-                                Host
-                            </Label>
+                        <Item style={{ position: 'relative' }} key={attn.username}>
+                            {attn.username === host?.username &&
+                                <Label
+                                    style={{ position: 'absolute' }}
+                                    color='orange'
+                                    ribbon='right'
+                                >
+                                    Host
+                                </Label>
+                            }
                             <Image size='tiny' src={attn.image || '/assets/user.png'} />
                             <Item.Content verticalAlign='middle'>
                                 <Item.Header as='h3'>

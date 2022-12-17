@@ -37,6 +37,7 @@ namespace Application.Activities
                     .SingleOrDefaultAsync(x => x.Id == request.Id);
 
                     if(activity == null) return null;
+
                     var user = await _context.Users.FirstOrDefaultAsync(
                         x => x.UserName == _userAccessor.GetUsername());
 
@@ -44,7 +45,7 @@ namespace Application.Activities
                 var hostUserName = activity.Attendees.FirstOrDefault(x => x.IsHost)?.AppUser?.UserName;
                 var attendance = activity.Attendees.FirstOrDefault(x => x.AppUser.UserName == user.UserName);
 
-                if(attendance !=null && hostUserName != user.UserName)
+                if(attendance !=null && hostUserName == user.UserName)
                         activity.IsCancelled = !activity.IsCancelled;
                 
                 if(attendance != null && user.UserName != null)
@@ -63,8 +64,6 @@ namespace Application.Activities
                 return result 
                     ? Result<Unit>.Success(Unit.Value) 
                     : Result<Unit>.Failure("Error occured while updating attendance");
-
-
             }
         }
     }
