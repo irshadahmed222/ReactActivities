@@ -1,9 +1,11 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { toast } from 'react-toastify';
-import { history } from '../..';
+// import { history } from '../..';
 import { Activity, ActivityFormValues } from '../models/activity';
 import { User, UserFormValues } from '../models/user';
 import { store } from '../store/store';
+import { router } from '../router/Routes';
+import { Photo, Profile } from '../models/profile';
 
 const sleep = (delay: number) => {
     return new Promise(resolve => {
@@ -31,7 +33,7 @@ axios.interceptors.response.use(async response => {
                 toast.error(data);
             }
             if(config.method === 'get' && data.errors.hasOwnProperty('id')) {
-                history.push('/not-found');
+                router.navigate('/not-found');
             }
             if(data.errors){
                 const modalStateErrors = [];
@@ -50,11 +52,11 @@ axios.interceptors.response.use(async response => {
             toast.error('unauthorized');
             break;
         case 404:
-            history.push('/not-found')
+            router.navigate('/not-found')
             break;
         case 500:
             store.commonStore.setServerError(data);
-            history.push('/server-error');
+            router.navigate('/server-error');
             break;
     }
     Promise.reject(error);
@@ -84,10 +86,24 @@ const Account = {
     login: (user: UserFormValues) => requests.post<User>('/account/login',user),
     register:(user: UserFormValues) => requests.post<User>('/account/register',user),
 }
+const Profiles = {
+    get : (username: string) => requests.get<Profile>(`/profiles/${username}`),
+    uploadPhoto: (file:Blob) => {
+        let formData = new FormData();
+        formData.append('File',file);
+        return axios.post<Photo>('photos',formData, {
+            headers: { 'Content-Type': 'multipart/form-data'}
+        });
+    },
+    setMainPhoto:(id: string) => requests.post(`/photos/${id}/setMain`,{}),
+    deletePhoto: (id: string) => requests.del(`/photos/${id}`)
+};
+
 
 const agent = {
     Activities,
-    Account
+    Account,
+    Profiles
 }
 
 export default agent;

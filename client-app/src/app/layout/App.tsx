@@ -1,20 +1,15 @@
 import React, { Fragment, useEffect } from 'react';
 import { Container } from 'semantic-ui-react';
 import Navbar from './Navbar';
-import ActivityDashboard from '../../features/activities/dashboard/ActivityDashboard';
 import { observer } from 'mobx-react-lite';
-import { Route, Switch, useLocation } from 'react-router-dom';
-import HomePage from '../../features/home/HomePage';
-import ActivityForm from '../../features/activities/form/ActivityForm';
-import ActivityDetails from '../../features/activities/details/ActivityDetails';
-import TestErrors from '../../features/errors/TestErrors';
+import { Outlet, useLocation } from 'react-router-dom';
+
 import { ToastContainer } from 'react-toastify';
-import NotFound from '../../features/errors/NotFound';
-import ServerError from '../../features/errors/ServerError';
-import LoginForm from '../../features/activities/users/LoginForm';
+
 import { useStore } from '../store/store';
 import LoadingComponent from './LoadingComponent';
 import ModalContainer from '../common/modals/ModalContainer';
+import HomePage from '../../features/home/HomePage';
 
 
 function App() {
@@ -22,21 +17,30 @@ function App() {
   const location = useLocation();
   const { commonStore, userStore } = useStore();
 
-  useEffect(()=>{
-    if(commonStore.token){
-      userStore.getUser().finally(() => {commonStore.setAppLoaded()})
+  useEffect(() => {
+    if (commonStore.token) {
+      userStore.getUser().finally(() => { commonStore.setAppLoaded() })
     } else {
       commonStore.setAppLoaded();
     }
-  },[commonStore,userStore]);
+  }, [commonStore, userStore]);
 
-  if(!commonStore.appLoaded) return <LoadingComponent content='Loading app' />
+  if (!commonStore.appLoaded) return <LoadingComponent content='Loading app' />
 
   return (
     <Fragment>
       <ModalContainer />
       <ToastContainer position='bottom-right' hideProgressBar />
-      <Route path='/' component={HomePage} exact />
+      {location.pathname === '/' ? <HomePage /> : (
+        <>
+      <Navbar />
+      <Container style={{ marginTop: '7em' }}>
+        <Outlet />
+      </Container>
+      </>
+      )}
+
+      {/* <Route path='/' component={HomePage} exact />
       <Route path={'/(.+)'}
         render={() => (
           <>
@@ -54,7 +58,8 @@ function App() {
             </Container>
           </>
         )}
-      />
+      /> */}
+
 
     </Fragment>
   );
